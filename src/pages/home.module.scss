@@ -1,4 +1,43 @@
 // TODO
-.class {
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+  max-width: 700px;
+  margin: 3rem auto 0 auto;
 
+  a {
+    text-decoration: none;
+
+    &:visited {
+      text-decoration: none;
+      color: var(--heading);
+    }
+  }
+
+  h1 {
+    font-weight: 700;
+    font-size: 28px;
+  }
+
+  p {
+    font-size: 18px;
+    line-height: 2.5rem;
+  }
+
+  time {
+    margin-right: 1.5rem;
+    line-height: 4rem;
+  }
+}
+
+.postInfoContainer {
+  display: flex;
+  align-items: center;
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
