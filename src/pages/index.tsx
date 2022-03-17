@@ -3,9 +3,13 @@ import Link from 'next/link';
 import Header from '../components/Header';
 
 import { getPrismicClient } from '../services/prismic';
+import Prismic from '@prismicio/client';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
@@ -28,42 +32,55 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home() {
+export default function Home({ postsPagination }: HomeProps) {
+  const posts = postsPagination.results;
+
   return (
     <>
       <Header />
       <div className={styles.contentContainer}>
-        <Link href="/">
-          <a>
-            <h1>Como utilizar Hooks</h1>
-            <p>pensando em sincronização em vez de ciclos de vida.</p>
-            <div className={styles.postInfoContainer}>
-              <div>
-                <FiCalendar />
-                <time>15 Mar 2021</time>
+        {posts.map(post => (
+          <Link href="/" key={post.uid}>
+            <a>
+              <h1>{post.data.title}</h1>
+              <p>{post.data.subtitle}</p>
+              <div className={styles.postInfoContainer}>
+                <div>
+                  <FiCalendar />
+                  <time>
+                    {format(
+                      new Date(post.first_publication_date),
+                      'dd MMM yyyy',
+                      { locale: ptBR }
+                    )}
+                  </time>
+                </div>
+                <div>
+                  <FiUser />
+                  <span>{post.data.author}</span>
+                </div>
               </div>
-              <div>
-                <FiUser />
-                <span>Joseph Oliveira</span>
-              </div>
-            </div>
-          </a>
-        </Link>
-        <Link href="/">
-          <a>
-            <h1>Como utilizar Hooks</h1>
-            <p>pensando em sincronização em vez de ciclos de vida.</p>
-            <time>15 Mar 2021</time> <span>Joseph Oliveira</span>
-          </a>
-        </Link>
+            </a>
+          </Link>
+        ))}
       </div>
     </>
   );
 }
 
-// export const getStaticProps = async () => {
-//   // const prismic = getPrismicClient();
-//   // const postsResponse = await prismic.query(TODO);
+export const getStaticProps = async () => {
+  const prismic = getPrismicClient();
+  const postsResponse = await prismic.query(
+    [Prismic.predicates.at('document.type', 'post')],
+    {
+      fetch: ['post.title', 'post.subtitle', 'post.author'],
+      pageSize: 5,
+    }
+  );
 
-//   // TODO
-// };
+  let postsPagination = postsResponse;
+
+  return {
+    props: { postsPagination },
+  };
+};
