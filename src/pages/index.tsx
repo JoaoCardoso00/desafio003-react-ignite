@@ -35,6 +35,8 @@ interface HomeProps {
 export default function Home({ postsPagination }: HomeProps) {
   const posts = postsPagination.results;
 
+  //! TODO: Post Slugs on click still missing
+
   return (
     <>
       <Header />
