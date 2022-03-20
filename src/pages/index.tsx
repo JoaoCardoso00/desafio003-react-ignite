@@ -33,16 +33,20 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps) {
-  const posts = postsPagination.results;
-
+  const postsRes = postsPagination.results;
   //! TODO: Post Slugs on click still missing
+
+  const posts = postsRes.map(post => ({
+    ...post,
+    slug: titleToSlug(post.data.title),
+  }));
 
   return (
     <>
       <Header />
       <div className={styles.contentContainer}>
         {posts.map(post => (
-          <Link href="/" key={post.uid}>
+          <Link href={`/post/${post.slug}`} key={post.uid}>
             <a>
               <h1>{post.data.title}</h1>
               <p>{post.data.subtitle}</p>
@@ -86,3 +90,13 @@ export const getStaticProps = async () => {
     props: { postsPagination },
   };
 };
+
+function titleToSlug(title: string) {
+  const a = 'àáäâãèéëêìíïîòóöôùúüûñçßÿœæŕśńṕẃǵǹḿǘẍźḧ·/_,:;'
+  const b = 'aaaaaeeeeiiiioooouuuuncsyoarsnpwgnmuxzh------'
+  const p = new RegExp(a.split('').join('|'), 'g')
+  return title.toString().toLowerCase().trim()
+    .replace(p, c => b.charAt(a.indexOf(c))) // Replace special chars
+    .replace(/&/g, '-and-') // Replace & with 'and'
+    .replace(/[\s\W-]+/g, '-') // Replace spaces, non-word characters and dashes with a single dash (-)
+}
