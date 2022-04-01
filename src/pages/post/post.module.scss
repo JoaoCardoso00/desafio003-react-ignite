@@ -1,1 +1,34 @@
 // TODO
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.banner {
+  max-height: 400px;
+  object-fit: cover;
+  width: 100vw;
+}
+
+.contentContainer {
+  h1 {
+    color: var(--heading);
+    margin-bottom: 1.5rem;
+  }
+}
+
+.postInfoContainer {
+  display: flex;
+  align-items: center;
+  color: var(--info);
+  gap: 2rem;
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
