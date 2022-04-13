@@ -2,6 +2,8 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 
 import { getPrismicClient } from '../../services/prismic';
 
+import prismicDom from 'prismic-dom';
+import Prismic from '@prismicio/client';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import { useRouter } from 'next/router';
@@ -32,7 +34,10 @@ interface PostProps {
 
 export default function Post({ post }: PostProps) {
   const router = useRouter();
-  const { slug } = router.query;
+  // const { slug } = router.query
+  if (router.isFallback) {
+    return <h1>Carregando...</h1>;
+  }
 
   return (
     <>
@@ -60,43 +65,37 @@ export default function Post({ post }: PostProps) {
             </div>
           </div>
         </div>
+         //! TODO: post content still missing
       </div>
     </>
   );
 }
 
 export const getStaticPaths = async () => {
-  // const prismic = getPrismicClient();
-  // const posts = await prismic.query(TODO);
+  const prismic = getPrismicClient();
+  const postsResponse = await prismic.query(
+    [Prismic.predicates.at('document.type', 'post')],
+    {
+      fetch: ['post.title'],
+    }
+  );
+
+  const paths = postsResponse.results.map(post => {
+    return { params: { slug: post.uid } };
+  });
 
   // TODO
   return {
-    paths: [],
+    paths: paths,
     fallback: 'blocking',
   };
 };
 
 export const getStaticProps = async context => {
   const { slug } = context.params;
-  let postSlug = slug.toString();
 
   const prismic = getPrismicClient();
-  const response = await prismic.getByUID('post', postSlug, {});
-
-  // const post = {
-  //   first_publication_date: response.first_publication_date,
-  //   data: {
-  //     title: response.data.title,
-  //     banner: {
-  //       url: response.data.banner.url
-  //     },
-  //     author: response.data.author,
-  //     content: {
-  //       heading: response.data.content[0].heading,
-  //       body: response.data.content[0].body
-  //     },
-  //   }
-  // }
+  const response = await prismic.getByUID('post', slug, {});
 
   // TODO
   return {
@@ -105,3 +104,7 @@ export const getStaticProps = async context => {
     },
   };
 };
+
+// function getReadTime(arr) {
+
+// }
