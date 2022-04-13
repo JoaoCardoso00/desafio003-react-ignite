@@ -5,6 +5,10 @@
   align-items: center;
   gap: 2rem;
   margin-top: 2rem;
+
+  .logoContainer {
+    transform: translateX(-20rem);
+  }
 }
 
 .banner {
@@ -25,10 +29,35 @@
   align-items: center;
   color: var(--info);
   gap: 2rem;
+  margin-bottom: 5rem;
 
   div {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
+}
+
+.content {
+  max-width: 920px;
+
+  p {
+    font-size: 18px;
+    color: var(--body);
+    line-height: 1.5rem;
+  }
+
+  p + p {
+    margin-bottom: 2rem;
+  }
+
+  a {
+    color: var(--highlight);
+    text-decoration: none;
+  }
+}
+
+.postHeading {
+  color: var(--heading);
+  margin: 1.5rem 0;
 }

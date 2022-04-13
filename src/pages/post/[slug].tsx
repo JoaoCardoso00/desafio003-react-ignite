@@ -2,7 +2,7 @@ import { GetStaticPaths, GetStaticProps } from 'next';
 
 import { getPrismicClient } from '../../services/prismic';
 
-import prismicDom from 'prismic-dom';
+import * as prismicH from '@prismicio/helpers';
 import Prismic from '@prismicio/client';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
@@ -42,7 +42,9 @@ export default function Post({ post }: PostProps) {
   return (
     <>
       <div className={styles.mainContainer}>
-        <Header />
+        <div className={styles.logoContainer}>
+          <Header />
+        </div>
         <img
           src={post.data.banner.url}
           alt={post.data.title}
@@ -64,8 +66,18 @@ export default function Post({ post }: PostProps) {
               <span>{post.data.author}</span>
             </div>
           </div>
+          {post.data.content.map(post => (
+            <>
+              <h2 className={styles.postHeading}>{post.heading}</h2>
+              <div
+                className={styles.content}
+                dangerouslySetInnerHTML={{
+                  __html: prismicH.asHTML(post.body),
+                }}
+              ></div>
+            </>
+          ))}
         </div>
-         //! TODO: post content still missing
       </div>
     </>
   );
