@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { FiCalendar, FiUser } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
 
 interface Post {
   uid?: string;
@@ -33,7 +34,14 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps) {
-  const posts = postsPagination.results;
+  const postsRes = postsPagination.results;
+
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
+
+  useEffect(() => {
+    setPosts(postsRes);
+  }, []);
 
   return (
     <>
@@ -66,6 +74,9 @@ export default function Home({ postsPagination }: HomeProps) {
               </a>
             </Link>
           ))}
+          {nextPage ? (
+            <a onClick={() => getMorePosts(postsPagination.next_page, posts, setPosts, setNextPage)} className={styles.loadMorePosts}>Carregar mais posts</a>
+          ) : null}
         </div>
       </div>
     </>
@@ -78,7 +89,7 @@ export const getStaticProps = async () => {
     [Prismic.predicates.at('document.type', 'post')],
     {
       fetch: ['post.title', 'post.subtitle', 'post.author'],
-      pageSize: 5,
+      pageSize: 3,
     }
   );
 
@@ -88,3 +99,14 @@ export const getStaticProps = async () => {
     props: { postsPagination },
   };
 };
+
+async function getMorePosts(nextPageUrl, posts: Post[], setPosts, setNextPage) {
+
+  const nextPage = await fetch(nextPageUrl)
+  let postResults = await nextPage.json()
+
+  // setPosts([...posts, postResults])
+  setPosts([...posts, ...postResults.results])
+
+  setNextPage(postResults.nextPage)
+}

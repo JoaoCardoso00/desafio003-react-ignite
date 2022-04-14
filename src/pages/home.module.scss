@@ -52,3 +52,9 @@
     transform: translateX(-14.5rem);
   }
 }
+
+.loadMorePosts {
+  cursor: pointer;
+  color: var(--highlight);
+  font-size: 1.2rem;
+}

@@ -8,7 +8,7 @@ import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
 import { useRouter } from 'next/router';
 import Header from '../../components/Header/index';
-import { FiCalendar, FiUser } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 interface Post {
@@ -50,7 +50,7 @@ export default function Post({ post }: PostProps) {
           alt={post.data.title}
           className={styles.banner}
         />
-        <div className={styles.contentContainer}>
+        <div className={styles.contentContainer} key={post.data.title}>
           <h1>{post.data.title}</h1>
           <div className={styles.postInfoContainer}>
             <div>
@@ -65,11 +65,19 @@ export default function Post({ post }: PostProps) {
               <FiUser />
               <span>{post.data.author}</span>
             </div>
+            <div>
+              <FiClock />
+              <span>{getReadTime(post)} min</span>
+            </div>
+            <span className={styles.invisibleSpan}>4 min</span>
           </div>
-          {post.data.content.map(post => (
+          {post.data.content.map((post, index) => (
             <>
-              <h2 className={styles.postHeading}>{post.heading}</h2>
+              <h2 className={styles.postHeading} key={post.heading}>
+                {post.heading}
+              </h2>
               <div
+                key={index}
                 className={styles.content}
                 dangerouslySetInnerHTML={{
                   __html: prismicH.asHTML(post.body),
@@ -96,7 +104,6 @@ export const getStaticPaths = async () => {
     return { params: { slug: post.uid } };
   });
 
-  // TODO
   return {
     paths: paths,
     fallback: 'blocking',
@@ -117,6 +124,18 @@ export const getStaticProps = async context => {
   };
 };
 
-// function getReadTime(arr) {
+function getReadTime(post: Post) {
+  let postContent = post.data.content;
 
-// }
+  const headingText = postContent.map(h => h.heading.split(/[, ]+/));
+  const postText = postContent.map(p => prismicH.asText(p.body));
+  const postWords = postText.map(w => w.split(/[, ]+/));
+
+  headingText.push(...postWords);
+
+  let totalWords = headingText.concat.apply([], headingText);
+
+  let readTime = Math.ceil(totalWords.length / 225);
+
+  return readTime;
+}
